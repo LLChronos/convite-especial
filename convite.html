@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Uma Produção Especial</title>
+
+<style>
+body {
+    margin: 0;
+    background: black;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+    color: white;
+}
+
+/* Partículas */
+canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+/* Intro */
+.intro {
+    position: absolute;
+    width: 100%;
+    top: 40%;
+    text-align: center;
+    font-size: 10vw;
+    font-weight: bold;
+    letter-spacing: 1vw;
+    color: #e50914;
+    opacity: 0;
+    transform: scale(0.5);
+    animation: aparecer 4s ease forwards;
+}
+
+@keyframes aparecer {
+    0% { opacity: 0; transform: scale(0.3); }
+    40% { opacity: 1; transform: scale(1.3); text-shadow: 0 0 40px #e50914; }
+    70% { transform: scale(1); }
+    100% { opacity: 1; }
+}
+
+/* Tela convite */
+.convite {
+    position: absolute;
+    width: 100%;
+    top: 30%;
+    text-align: center;
+    opacity: 0;
+    transition: 2s;
+}
+
+button {
+    padding: 15px 40px;
+    font-size: 20px;
+    border-radius: 30px;
+    border: none;
+    background: #e50914;
+    color: white;
+    cursor: pointer;
+    margin-top: 30px;
+    transition: 0.3s;
+}
+
+button:hover {
+    background: white;
+    color: #e50914;
+}
+
+#nao {
+    position: fixed;
+    background: gray;
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="stars"></canvas>
+
+<audio id="tudum">
+<source src="netflix-tudum-sfx-n-c" type="audio/mpeg">
+</audio>
+
+<audio id="romantica" loop>
+<source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3?filename=romantic-background-112199.mp3" type="audio/mpeg">
+</audio>
+
+<div class="intro" id="intro">
+Maria Eduarda Cordeiro
+</div>
+
+<div class="convite" id="convite">
+<h1>Tenho uma proposta para você</h1>
+<h2>Você aceita sair comigo esse final de semana? ❤️</h2>
+
+<button onclick="aceitou()">ACEITO 💖</button>
+<button id="nao">NÃO 😏</button>
+
+</div>
+
+<script>
+// ====== PARTÍCULAS ======
+const canvas = document.getElementById("stars");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let stars = [];
+
+for (let i = 0; i < 100; i++) {
+    stars.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        radius: Math.random() * 2,
+        speed: Math.random() * 0.5
+    });
+}
+
+function drawStars() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "white";
+
+    stars.forEach(star => {
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+        ctx.fill();
+
+        star.y += star.speed;
+        if (star.y > canvas.height) star.y = 0;
+    });
+
+    requestAnimationFrame(drawStars);
+}
+
+drawStars();
+
+// ====== ANIMAÇÃO PRINCIPAL ======
+const tudum = document.getElementById("tudum");
+const romantica = document.getElementById("romantica");
+
+romantica.volume = 0.4; // volume suave
+
+setTimeout(() => {
+    tudum.play();
+}, 500);
+
+setTimeout(() => {
+    document.getElementById("intro").style.display = "none";
+    document.getElementById("convite").style.opacity = "1";
+    romantica.play();
+}, 5000);
+
+// ====== ACEITOU ======
+function aceitou() {
+    document.body.innerHTML = `
+    <div style="display:flex;justify-content:center;align-items:center;height:100vh;background:black;color:white;text-align:center;">
+        <div>
+            <h1 style="color:#e50914;font-size:50px;">Melhor decisão da temporada 😍</h1>
+            <h2>Te mando mensagem com os detalhes...</h2>
+        </div>
+    </div>
+    `;
+}
+
+// ====== BOTÃO NÃO QUE FOGE ANTES DO MOUSE ENCOSTAR ======
+const botaoNao = document.getElementById("nao");
+
+function moverBotao() {
+    const margem = 20;
+    const largura = window.innerWidth - botaoNao.offsetWidth - margem;
+    const altura = window.innerHeight - botaoNao.offsetHeight - margem;
+
+    const x = Math.random() * largura;
+    const y = Math.random() * altura;
+
+    botaoNao.style.left = x + "px";
+    botaoNao.style.top = y + "px";
+}
+
+document.addEventListener("mousemove", (e) => {
+    const rect = botaoNao.getBoundingClientRect();
+
+    const distanciaX = e.clientX - (rect.left + rect.width / 2);
+    const distanciaY = e.clientY - (rect.top + rect.height / 2);
+
+    const distancia = Math.sqrt(distanciaX * distanciaX + distanciaY * distanciaY);
+
+    if (distancia < 120) {
+        moverBotao();
+    }
+});
+
+botaoNao.addEventListener("touchstart", moverBotao);
+
+</script>
+
+</body>
+</html>
